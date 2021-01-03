@@ -1,6 +1,8 @@
 package ru.allbets.bets_parser.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -11,7 +13,7 @@ public class Event {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "id_league")
+    @Column(name = "league_id")
     private int leagueId;
 
     @Column(name = "id_team_first")
@@ -41,7 +43,28 @@ public class Event {
     @Column(name = "win_second_or_draw")
     private double teamSecondWinOrDrawCoeff;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "league_id")
+    League league;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+    List<Team> teams;
+
     public Event() {
+    }
+
+    public void addTeamToEvent(Team team) {
+        if (teams == null) teams = new ArrayList<>();
+        teams.add(team);
+        team.setEvent(this);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getLeagueId() {
@@ -122,5 +145,21 @@ public class Event {
 
     public void setTeamSecondWinOrDrawCoeff(double teamSecondWinOrDrawCoeff) {
         this.teamSecondWinOrDrawCoeff = teamSecondWinOrDrawCoeff;
+    }
+
+    public League getLeague() {
+        return league;
+    }
+
+    public void setLeague(League league) {
+        this.league = league;
+    }
+
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
     }
 }

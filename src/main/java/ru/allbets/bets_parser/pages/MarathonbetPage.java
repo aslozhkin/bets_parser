@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Component
 public class MarathonbetPage extends AbstractPage {
-    private static final String URL = "https://www.marathonbet.ru/su/popular/Football";
+    private static final String URL = "https://www.marathonbet.ru/su/popular/Football?interval=H24";
 
     @Autowired
     private DriverManager driverManager;
@@ -52,11 +52,20 @@ public class MarathonbetPage extends AbstractPage {
                 Team firstTeam = teamRepository.findByName(eventData.get("firstTeamName"));
                 Team secondTeam = teamRepository.findByName(eventData.get("secondTeamName"));
 
-                event.addTeamToEvent(firstTeam);
-                event.addTeamToEvent(secondTeam);
+                firstTeam.addEventToFirstTeam(event);
+                secondTeam.addEventToSecondTeam(event);
                 league.addEventToLeague(event);
 
-                eventRepository.save(event);
+                event.setTeamFirstWinCoeff(Double.parseDouble(eventData.get("teamFirstWinCoeff")));
+                event.setDrawCoeff(Double.parseDouble(eventData.get("drawCoeff")));
+                event.setTeamSecondWinCoeff(Double.parseDouble(eventData.get("teamSecondWinCoeff")));
+                event.setTeamFirstWinOrDrawCoeff(Double.parseDouble(eventData.get("teamFirstWinOrDrawCoeff")));
+                event.setTeamFirstWinOrSecondCoeff(Double.parseDouble(eventData.get("teamFirstWinOrSecondCoeff")));
+                event.setTeamSecondWinOrDrawCoeff(Double.parseDouble(eventData.get("teamSecondWinOrDrawCoeff")));
+                event.setBkId(1);
+
+//                eventRepository.save(event);
+                leagueRepository.save(league);
             }
             driver.navigate().back();
         }
@@ -65,8 +74,14 @@ public class MarathonbetPage extends AbstractPage {
     @Override
     public Map<String, String> getEventData(WebElement webElement) {
         Map<String, String> data = new HashMap<>();
-        String firstTeamName = webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[1]//span")).getText();
-        String secondTeamName = webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[2]//span")).getText();
+        data.put("firstTeamName", webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[1]//span")).getText());
+        data.put("secondTeamName",webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[2]//span")).getText());
+        data.put("teamFirstWinCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.1')]")).getText());
+        data.put("drawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.draw')]")).getText());
+        data.put("teamSecondWinCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.3')]")).getText());
+        data.put("teamFirstWinOrDrawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.HD')]")).getText());
+        data.put("teamFirstWinOrSecondCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.HA')]")).getText());
+        data.put("teamSecondWinOrDrawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.AD')]")).getText());
 
         return data;
     }

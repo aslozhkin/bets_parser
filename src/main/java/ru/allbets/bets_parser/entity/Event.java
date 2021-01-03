@@ -13,14 +13,14 @@ public class Event {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "league_id")
-    private int leagueId;
+//    @Column(name = "league_id")
+//    private int leagueId;
 
-    @Column(name = "id_team_first")
-    private int firstTeamId;
-
-    @Column(name = "id_team_second")
-    private int secondTeamId;
+//    @Column(name = "id_team_first")
+//    private int firstTeamId;
+//
+//    @Column(name = "id_team_second")
+//    private int secondTeamId;
 
     @Column(name = "id_bk")
     private int bkId;
@@ -45,19 +45,24 @@ public class Event {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "league_id")
-    League league;
+    private League league;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
-    List<Team> teams;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_team_first")
+    private Team firstTeam;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_team_second")
+    private Team secondTeam;
 
     public Event() {
     }
 
-    public void addTeamToEvent(Team team) {
-        if (teams == null) teams = new ArrayList<>();
-        teams.add(team);
-        team.setEvent(this);
-    }
+//    public void addTeamToEvent(Team team) {
+//        if (teams == null) teams = new ArrayList<>();
+//        teams.add(team);
+//        team.setEvent(this);
+//    }
 
     public int getId() {
         return id;
@@ -67,29 +72,29 @@ public class Event {
         this.id = id;
     }
 
-    public int getLeagueId() {
-        return leagueId;
-    }
-
-    public void setLeagueId(int leagueId) {
-        this.leagueId = leagueId;
-    }
-
-    public int getFirstTeamId() {
-        return firstTeamId;
-    }
-
-    public void setFirstTeamId(int firstTeamId) {
-        this.firstTeamId = firstTeamId;
-    }
-
-    public int getSecondTeamId() {
-        return secondTeamId;
-    }
-
-    public void setSecondTeamId(int secondTeamId) {
-        this.secondTeamId = secondTeamId;
-    }
+//    public int getLeagueId() {
+//        return leagueId;
+//    }
+//
+//    public void setLeagueId(int leagueId) {
+//        this.leagueId = leagueId;
+//    }
+//
+//    public int getFirstTeamId() {
+//        return firstTeamId;
+//    }
+//
+//    public void setFirstTeamId(int firstTeamId) {
+//        this.firstTeamId = firstTeamId;
+//    }
+//
+//    public int getSecondTeamId() {
+//        return secondTeamId;
+//    }
+//
+//    public void setSecondTeamId(int secondTeamId) {
+//        this.secondTeamId = secondTeamId;
+//    }
 
     public int getBkId() {
         return bkId;
@@ -155,11 +160,27 @@ public class Event {
         this.league = league;
     }
 
-    public List<Team> getTeams() {
-        return teams;
+    public Team getFirstTeam() {
+        return firstTeam;
     }
 
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
+    public void setFirstTeam(Team firstTeam) {
+        this.firstTeam = firstTeam;
     }
+
+    public Team getSecondTeam() {
+        return secondTeam;
+    }
+
+    public void setSecondTeam(Team secondTeam) {
+        this.secondTeam = secondTeam;
+    }
+
+    //    public List<Team> getTeams() {
+//        return teams;
+//    }
+//
+//    public void setTeams(List<Team> teams) {
+//        this.teams = teams;
+//    }
 }

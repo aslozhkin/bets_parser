@@ -2,7 +2,6 @@ package ru.allbets.bets_parser.pages;
 
 import org.openqa.selenium.WebElement;
 
-import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractPage {

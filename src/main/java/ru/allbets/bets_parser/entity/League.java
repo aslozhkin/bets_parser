@@ -46,4 +46,12 @@ public class League {
     public void setName(String name) {
         this.name = name;
     }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
 }

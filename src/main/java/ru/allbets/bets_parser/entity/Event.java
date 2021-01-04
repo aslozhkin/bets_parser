@@ -1,6 +1,8 @@
 package ru.allbets.bets_parser.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -11,7 +13,7 @@ public class Event {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "id_league")
+    @Column(name = "league_id")
     private int leagueId;
 
     @Column(name = "id_team_first")
@@ -42,6 +44,14 @@ public class Event {
     private double teamSecondWinOrDrawCoeff;
 
     public Event() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getLeagueId() {

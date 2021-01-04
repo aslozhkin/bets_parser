@@ -5,25 +5,28 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.allbets.bets_parser.dao.BookmakerRepository;
 import ru.allbets.bets_parser.dao.EventRepository;
 import ru.allbets.bets_parser.dao.LeagueRepository;
 import ru.allbets.bets_parser.dao.TeamRepository;
+import ru.allbets.bets_parser.entity.Bookmaker;
 import ru.allbets.bets_parser.entity.Event;
 import ru.allbets.bets_parser.entity.League;
 import ru.allbets.bets_parser.entity.Team;
 import ru.allbets.bets_parser.utils.DriverManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class MarathonbetPage extends AbstractPage {
-    private static final String URL = "https://www.marathonbet.ru/su/popular/Football?interval=H24";
+    private final String url = "https://www.marathonbet.ru/su/popular/Football?interval=H24";
+    private final String name = "Марафон Бет";
 
     @Autowired
     private DriverManager driverManager;
+
+    @Autowired
+    private BookmakerRepository bookmakerRepository;
 
     @Autowired
     private EventRepository eventRepository;
@@ -36,12 +39,15 @@ public class MarathonbetPage extends AbstractPage {
 
     @Override
     public void parseEvents() {
+        Bookmaker bookmaker = bookmakerRepository.findByName(name);
+
         WebDriver driver = driverManager.getDriver();
-        driver.get(URL);
+        driver.get(url);
         List<WebElement> categoryContainers = driver.findElements(By.xpath("//*[@class='category-container']"));
 //        iter leagues
-        for (WebElement categoryContainer : categoryContainers) {
+//        for (WebElement categoryContainer : categoryContainers) { //return
             League league = leagueRepository.findById(1).get();
+        WebElement categoryContainer = categoryContainers.get(0); //delete
             categoryContainer.findElement(By.xpath(".//*[@class='category-label-link']")).click();
 //            Parse events
             List<WebElement> events = driver.findElements(By.xpath("//table[@class='coupon-row-item']"));
@@ -52,9 +58,10 @@ public class MarathonbetPage extends AbstractPage {
                 Team firstTeam = teamRepository.findByName(eventData.get("firstTeamName"));
                 Team secondTeam = teamRepository.findByName(eventData.get("secondTeamName"));
 
-                firstTeam.addEventToFirstTeam(event);
-                secondTeam.addEventToSecondTeam(event);
-                league.addEventToLeague(event);
+                event.setLeagueId(league.getId());
+                event.setFirstTeamId(firstTeam.getId());
+                event.setSecondTeamId(secondTeam.getId());
+                event.setBkId(bookmaker.getId());
 
                 event.setTeamFirstWinCoeff(Double.parseDouble(eventData.get("teamFirstWinCoeff")));
                 event.setDrawCoeff(Double.parseDouble(eventData.get("drawCoeff")));
@@ -62,13 +69,12 @@ public class MarathonbetPage extends AbstractPage {
                 event.setTeamFirstWinOrDrawCoeff(Double.parseDouble(eventData.get("teamFirstWinOrDrawCoeff")));
                 event.setTeamFirstWinOrSecondCoeff(Double.parseDouble(eventData.get("teamFirstWinOrSecondCoeff")));
                 event.setTeamSecondWinOrDrawCoeff(Double.parseDouble(eventData.get("teamSecondWinOrDrawCoeff")));
-                event.setBkId(1);
 
-//                eventRepository.save(event);
-                leagueRepository.save(league);
+                eventRepository.save(event);
+
             }
             driver.navigate().back();
-        }
+//        }
     }
 
     @Override

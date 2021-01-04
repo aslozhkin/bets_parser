@@ -16,25 +16,7 @@ public class Team {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "firstTeam", fetch = FetchType.EAGER)
-    private List<Event> firstTeamEvents;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "secondTeam", fetch = FetchType.EAGER)
-    private List<Event> secondTeamEvents;
-
     public Team() {
-    }
-
-    public void addEventToFirstTeam(Event event) {
-        if (firstTeamEvents == null) firstTeamEvents = new ArrayList<>();
-        firstTeamEvents.add(event);
-        event.setFirstTeam(this);
-    }
-
-    public void addEventToSecondTeam(Event event) {
-        if (secondTeamEvents == null) secondTeamEvents = new ArrayList<>();
-        secondTeamEvents.add(event);
-        event.setSecondTeam(this);
     }
 
     public int getId() {
@@ -52,28 +34,4 @@ public class Team {
     public void setName(String name) {
         this.name = name;
     }
-
-    public List<Event> getFirstTeamEvents() {
-        return firstTeamEvents;
-    }
-
-    public void setFirstTeamEvents(List<Event> firstTeamEvents) {
-        this.firstTeamEvents = firstTeamEvents;
-    }
-
-    public List<Event> getSecondTeamEvents() {
-        return secondTeamEvents;
-    }
-
-    public void setSecondTeamEvents(List<Event> secondTeamEvents) {
-        this.secondTeamEvents = secondTeamEvents;
-    }
-
-    //    public Event getEvent() {
-//        return event;
-//    }
-//
-//    public void setEvent(Event event) {
-//        this.event = event;
-//    }
 }

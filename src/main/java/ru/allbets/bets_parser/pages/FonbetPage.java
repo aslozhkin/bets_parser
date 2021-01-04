@@ -15,12 +15,14 @@ import ru.allbets.bets_parser.entity.League;
 import ru.allbets.bets_parser.entity.Team;
 import ru.allbets.bets_parser.utils.DriverManager;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
-public class MarathonbetPage extends AbstractPage {
-    private final String url = "https://www.marathonbet.ru/su/popular/Football?interval=H24";
-    private final String name = "Марафон Бет";
+public class FonbetPage extends AbstractPage {
+    private final String url = "https://www.fonbet.ru/";
+    private final String name = "Фонбет";
 
     @Autowired
     private DriverManager driverManager;

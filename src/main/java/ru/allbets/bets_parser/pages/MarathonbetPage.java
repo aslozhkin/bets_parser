@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.allbets.bets_parser.Exceptions.NoSuchLeagueException;
 import ru.allbets.bets_parser.dao.BookmakerRepository;
 import ru.allbets.bets_parser.dao.EventRepository;
 import ru.allbets.bets_parser.dao.LeagueRepository;
@@ -21,8 +22,11 @@ import java.util.*;
 
 @Component
 public class MarathonbetPage extends AbstractPage {
-    private final String url = "https://www.marathonbet.ru/su/popular/Football?interval=H24";
+    private final String url = "https://www.marathonbet.ru/su/betting/Football";
     private final String name = "Марафон Бет";
+    private final String engPremiereLeague = "/England/Premier+League";
+    private final String spainPremiereLeague = "/Spain/Primera+Division";
+    private final String portugalPremiereLeague = "/Portugal/Primeira+Liga";
 
     @Autowired
     private DriverManager driverManager;
@@ -43,62 +47,62 @@ public class MarathonbetPage extends AbstractPage {
 
     @Override
     public void parseEvents() {
-        logger.debug("Start parsing Marathonbet");
+        logger.info("Start parsing Marathonbet");
 
         Bookmaker bookmaker = bookmakerRepository.findByName(name);
 
         WebDriver driver = driverManager.getDriver();
-        driver.get(url);
 //        iter leagues
         List<League> leagues = leagueRepository.findAll();
         for (League league : leagues) {
-            List<WebElement> categoryContainers = driver.findElements(By.xpath("//*[@class='category-container']"));
-            WebElement categoryContainer = categoryContainers.stream().filter(WebElement::isDisplayed)
-                    .filter(container -> container.findElement(By.xpath(".//h2")).getText().equals(league.getMarathonBetName()))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Отсутствует лига: \"" + league.getMarathonBetName() + "\""));
-            categoryContainer.findElement(By.xpath(".//*[@class='category-label-link']")).click();
-//            Parse events
-            List<WebElement> events = driver.findElements(By.xpath("//table[@class='coupon-row-item']"));
-            for (WebElement eventElement : events) {
-                Event event = new Event();
-                Map<String, String> eventData = getEventData(eventElement);
-
-                Team firstTeam = teamRepository.findByMarathonBetName(eventData.get("firstTeamName"));
-                Team secondTeam = teamRepository.findByMarathonBetName(eventData.get("secondTeamName"));
-
-                event.setLeagueId(league.getId());
-                event.setFirstTeamId(firstTeam.getId());
-                event.setSecondTeamId(secondTeam.getId());
-                event.setBkId(bookmaker.getId());
-
-                event.setTeamFirstWinCoeff(Double.parseDouble(eventData.get("teamFirstWinCoeff")));
-                event.setDrawCoeff(Double.parseDouble(eventData.get("drawCoeff")));
-                event.setTeamSecondWinCoeff(Double.parseDouble(eventData.get("teamSecondWinCoeff")));
-                event.setTeamFirstWinOrDrawCoeff(Double.parseDouble(eventData.get("teamFirstWinOrDrawCoeff")));
-                event.setTeamFirstWinOrSecondCoeff(Double.parseDouble(eventData.get("teamFirstWinOrSecondCoeff")));
-                event.setTeamSecondWinOrDrawCoeff(Double.parseDouble(eventData.get("teamSecondWinOrDrawCoeff")));
-
-                eventRepository.save(event);
-
+            switch (league.getMarathonBetName()) {
+                case "Англия. Премьер-лига" : driver.get(url + engPremiereLeague);
+                break;
+                case "Испания. Примера дивизион" : driver.get(url + spainPremiereLeague);
+                break;
+                case "Португалия. Примейра-лига" : driver.get(url + portugalPremiereLeague);
+                break;
+                default: throw new NoSuchLeagueException("Отсутствует лига: \"" + league.getMarathonBetName() + "\"");
             }
-            driver.navigate().back();
-        }
+                List<WebElement> events = driver.findElements(By.xpath("//table[@class='coupon-row-item']"));
+                for (WebElement eventElement : events) {
+                    Event event = new Event();
+                    Map<String, String> eventData = getEventData(eventElement);
 
-        logger.debug("End parsing Marathonbet");
+                    Team firstTeam = teamRepository.findByMarathonBetName(eventData.get("firstTeamName"));
+                    Team secondTeam = teamRepository.findByMarathonBetName(eventData.get("secondTeamName"));
+
+                    event.setLeagueId(league.getId());
+                    event.setFirstTeamId(firstTeam.getId());
+                    event.setSecondTeamId(secondTeam.getId());
+                    event.setBkId(bookmaker.getId());
+
+                    event.setTeamFirstWinCoeff(Double.parseDouble(eventData.get("teamFirstWinCoeff")));
+                    event.setDrawCoeff(Double.parseDouble(eventData.get("drawCoeff")));
+                    event.setTeamSecondWinCoeff(Double.parseDouble(eventData.get("teamSecondWinCoeff")));
+                    event.setTeamFirstWinOrDrawCoeff(Double.parseDouble(eventData.get("teamFirstWinOrDrawCoeff")));
+                    event.setTeamFirstWinOrSecondCoeff(Double.parseDouble(eventData.get("teamFirstWinOrSecondCoeff")));
+                    event.setTeamSecondWinOrDrawCoeff(Double.parseDouble(eventData.get("teamSecondWinOrDrawCoeff")));
+
+                    eventRepository.save(event);
+
+                }
+        }
+        logger.info("End parsing Marathonbet");
+        driverManager.shutDownDriver();
     }
 
     @Override
     public Map<String, String> getEventData(WebElement webElement) {
         Map<String, String> data = new HashMap<>();
         data.put("firstTeamName", webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[1]//span")).getText());
-        data.put("secondTeamName",webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[2]//span")).getText());
-        data.put("teamFirstWinCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.1')]")).getText());
-        data.put("drawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.draw')]")).getText());
-        data.put("teamSecondWinCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.3')]")).getText());
-        data.put("teamFirstWinOrDrawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.HD')]")).getText());
-        data.put("teamFirstWinOrSecondCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.HA')]")).getText());
-        data.put("teamSecondWinOrDrawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.AD')]")).getText());
+        data.put("secondTeamName", webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[2]//span")).getText());
+        data.put("teamFirstWinCoeff", webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.1')]")).getText());
+        data.put("drawCoeff", webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.draw')]")).getText());
+        data.put("teamSecondWinCoeff", webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.3')]")).getText());
+        data.put("teamFirstWinOrDrawCoeff", webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.HD')]")).getText());
+        data.put("teamFirstWinOrSecondCoeff", webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.HA')]")).getText());
+        data.put("teamSecondWinOrDrawCoeff", webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.AD')]")).getText());
 
         return data;
     }

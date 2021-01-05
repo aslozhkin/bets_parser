@@ -45,7 +45,7 @@ public class FonbetPage extends AbstractPage {
 
     @Override
     public void parseEvents() {
-        logger.debug("Start parsing Fonbet");
+        logger.info("Start parsing Fonbet");
 
         Bookmaker bookmaker = bookmakerRepository.findByName(name);
 
@@ -55,6 +55,7 @@ public class FonbetPage extends AbstractPage {
 //        iter leagues
         List<League> leagues = leagueRepository.findAll();
         for (League league : leagues) {
+            if (league.getFonbetName().isEmpty()) break;
             WebElement leagueLink = driver.findElement(By.xpath("//span[text()='" + league.getFonbetName() + "']"));
             leagueLink.click();
 //            Parse events
@@ -83,7 +84,8 @@ public class FonbetPage extends AbstractPage {
             }
             driver.findElement(By.xpath("//div[contains(@title,'" + league.getFonbetName() + "')]//span[2]")).click();
         }
-        logger.debug("End parsing Fonbet");
+        logger.info("End parsing Fonbet");
+        driverManager.shutDownDriver();
     }
 
     @Override

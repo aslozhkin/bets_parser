@@ -4,7 +4,11 @@ import org.openqa.selenium.WebElement;
 
 import java.util.Map;
 
-public abstract class AbstractPage {
+public abstract class AbstractPage extends Thread{
+    @Override
+    public void run() {
+        parseEvents();
+    }
 
     public abstract void parseEvents();
 

@@ -1,5 +1,7 @@
 package ru.allbets.bets_parser.pages;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -37,8 +39,12 @@ public class MarathonbetPage extends AbstractPage {
     @Autowired
     private TeamRepository teamRepository;
 
+    private final Logger logger = LogManager.getLogger(MarathonbetPage.class);
+
     @Override
     public void parseEvents() {
+        logger.debug("Start parsing Marathonbet");
+
         Bookmaker bookmaker = bookmakerRepository.findByName(name);
 
         WebDriver driver = driverManager.getDriver();
@@ -48,9 +54,9 @@ public class MarathonbetPage extends AbstractPage {
         for (League league : leagues) {
             List<WebElement> categoryContainers = driver.findElements(By.xpath("//*[@class='category-container']"));
             WebElement categoryContainer = categoryContainers.stream().filter(WebElement::isDisplayed)
-                    .filter(container -> container.findElement(By.xpath(".//h2")).getText().equals(league.getName()))
+                    .filter(container -> container.findElement(By.xpath(".//h2")).getText().equals(league.getMarathonBetName()))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Отсутствует лига: \"" + league.getName() + "\""));
+                    .orElseThrow(() -> new RuntimeException("Отсутствует лига: \"" + league.getMarathonBetName() + "\""));
             categoryContainer.findElement(By.xpath(".//*[@class='category-label-link']")).click();
 //            Parse events
             List<WebElement> events = driver.findElements(By.xpath("//table[@class='coupon-row-item']"));
@@ -58,8 +64,8 @@ public class MarathonbetPage extends AbstractPage {
                 Event event = new Event();
                 Map<String, String> eventData = getEventData(eventElement);
 
-                Team firstTeam = teamRepository.findByName(eventData.get("firstTeamName"));
-                Team secondTeam = teamRepository.findByName(eventData.get("secondTeamName"));
+                Team firstTeam = teamRepository.findByMarathonBetName(eventData.get("firstTeamName"));
+                Team secondTeam = teamRepository.findByMarathonBetName(eventData.get("secondTeamName"));
 
                 event.setLeagueId(league.getId());
                 event.setFirstTeamId(firstTeam.getId());
@@ -78,7 +84,8 @@ public class MarathonbetPage extends AbstractPage {
             }
             driver.navigate().back();
         }
-        System.out.println("Done!");
+
+        logger.debug("End parsing Marathonbet");
     }
 
     @Override

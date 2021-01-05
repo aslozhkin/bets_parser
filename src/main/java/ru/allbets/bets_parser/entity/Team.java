@@ -13,8 +13,11 @@ public class Team {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "marathonbet_name")
+    private String marathonBetName;
+
+    @Column(name = "fonbet_name")
+    private String fonbetName;
 
     public Team() {
     }
@@ -27,11 +30,19 @@ public class Team {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getMarathonBetName() {
+        return marathonBetName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setMarathonBetName(String marathonBetName) {
+        this.marathonBetName = marathonBetName;
+    }
+
+    public String getFonbetName() {
+        return fonbetName;
+    }
+
+    public void setFonbetName(String fonbetName) {
+        this.fonbetName = fonbetName;
     }
 }

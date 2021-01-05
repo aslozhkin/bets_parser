@@ -1,5 +1,7 @@
 package ru.allbets.bets_parser.pages;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -39,29 +41,30 @@ public class FonbetPage extends AbstractPage {
     @Autowired
     private TeamRepository teamRepository;
 
+    private final Logger logger = LogManager.getLogger(MarathonbetPage.class);
+
     @Override
     public void parseEvents() {
+        logger.debug("Start parsing Fonbet");
+
         Bookmaker bookmaker = bookmakerRepository.findByName(name);
 
         WebDriver driver = driverManager.getDriver();
         driver.get(url);
+        driver.findElement(By.xpath("//div[@title='Футбол']/span[1]")).click();
 //        iter leagues
         List<League> leagues = leagueRepository.findAll();
         for (League league : leagues) {
-            List<WebElement> categoryContainers = driver.findElements(By.xpath("//*[@class='category-container']"));
-            WebElement categoryContainer = categoryContainers.stream().filter(WebElement::isDisplayed)
-                    .filter(container -> container.findElement(By.xpath(".//h2")).getText().equals(league.getName()))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Отсутствует лига: \"" + league.getName() + "\""));
-            categoryContainer.findElement(By.xpath(".//*[@class='category-label-link']")).click();
+            WebElement leagueLink = driver.findElement(By.xpath("//span[text()='" + league.getFonbetName() + "']"));
+            leagueLink.click();
 //            Parse events
-            List<WebElement> events = driver.findElements(By.xpath("//table[@class='coupon-row-item']"));
+            List<WebElement> events = driver.findElements(By.xpath("//div[contains(@class,'top-event-list')]/div"));
             for (WebElement eventElement : events) {
                 Event event = new Event();
                 Map<String, String> eventData = getEventData(eventElement);
 
-                Team firstTeam = teamRepository.findByName(eventData.get("firstTeamName"));
-                Team secondTeam = teamRepository.findByName(eventData.get("secondTeamName"));
+                Team firstTeam = teamRepository.findByFonbetName(eventData.get("firstTeamName"));
+                Team secondTeam = teamRepository.findByFonbetName(eventData.get("secondTeamName"));
 
                 event.setLeagueId(league.getId());
                 event.setFirstTeamId(firstTeam.getId());
@@ -78,22 +81,26 @@ public class FonbetPage extends AbstractPage {
                 eventRepository.save(event);
 
             }
-            driver.navigate().back();
+            driver.findElement(By.xpath("//div[contains(@title,'" + league.getFonbetName() + "')]//span[2]")).click();
         }
-        System.out.println("Done!");
+        logger.debug("End parsing Fonbet");
     }
 
     @Override
     public Map<String, String> getEventData(WebElement webElement) {
+        WebDriver driver = driverManager.getDriver();
         Map<String, String> data = new HashMap<>();
-        data.put("firstTeamName", webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[1]//span")).getText());
-        data.put("secondTeamName",webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[2]//span")).getText());
-        data.put("teamFirstWinCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.1')]")).getText());
-        data.put("drawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.draw')]")).getText());
-        data.put("teamSecondWinCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Match_Result.3')]")).getText());
-        data.put("teamFirstWinOrDrawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.HD')]")).getText());
-        data.put("teamFirstWinOrSecondCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.HA')]")).getText());
-        data.put("teamSecondWinOrDrawCoeff",webElement.findElement(By.xpath(".//span[contains(@data-selection-key,'Result.AD')]")).getText());
+        data.put("firstTeamName", webElement.findElement(By.xpath(".//a[contains(@class,'title-teams')]//span[1]")).getText());
+        data.put("secondTeamName",webElement.findElement(By.xpath(".//a[contains(@class,'title-teams')]//span[2]")).getText());
+        data.put("teamFirstWinCoeff",webElement.findElement(By.xpath(".//div[@class='top-event-item__market-cell--1owrF'][1]//span")).getText());
+        data.put("drawCoeff",webElement.findElement(By.xpath(".//div[@class='top-event-item__market-cell--1owrF'][2]//span")).getText());
+        data.put("teamSecondWinCoeff",webElement.findElement(By.xpath(".//div[@class='top-event-item__market-cell--1owrF'][3]//span")).getText());
+        driver.findElement(By.xpath("//a[contains(text(),'Двойные шансы')]")).click();
+        List<WebElement> doubleChances = driver.findElements(By.xpath("//div[@class='top-event-item__market-cell--1owrF _style_row--HSj5r']/span[2]"));
+        data.put("teamFirstWinOrDrawCoeff", doubleChances.get(0).getText());
+        data.put("teamFirstWinOrSecondCoeff", doubleChances.get(1).getText());
+        data.put("teamSecondWinOrDrawCoeff", doubleChances.get(2).getText());
+        driver.findElement(By.xpath("//a[contains(text(),'Исходы')]")).click();
 
         return data;
     }

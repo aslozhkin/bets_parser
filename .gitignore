@@ -15,8 +15,6 @@ target/
 
 ### IntelliJ IDEA ###
 .idea
-logs
-debug.log
 *.iws
 *.iml
 *.ipr
@@ -33,3 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/logs/

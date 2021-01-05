@@ -20,6 +20,7 @@ public class Parser {
 //        #todo Написать запрос на обнуление id таблицы events
         for (AbstractPage page : pages) {
             page.start();
+//            page.parseEvents();
         }
     }
 

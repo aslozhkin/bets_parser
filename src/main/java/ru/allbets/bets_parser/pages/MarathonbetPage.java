@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.allbets.bets_parser.Exceptions.NoSuchLeagueException;
+import ru.allbets.bets_parser.exceptions.NoSuchLeagueException;
 import ru.allbets.bets_parser.dao.BookmakerRepository;
 import ru.allbets.bets_parser.dao.EventRepository;
 import ru.allbets.bets_parser.dao.LeagueRepository;

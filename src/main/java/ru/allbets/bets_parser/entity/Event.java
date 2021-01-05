@@ -2,7 +2,9 @@ package ru.allbets.bets_parser.entity;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "events")
@@ -132,5 +134,16 @@ public class Event {
 
     public void setTeamSecondWinOrDrawCoeff(double teamSecondWinOrDrawCoeff) {
         this.teamSecondWinOrDrawCoeff = teamSecondWinOrDrawCoeff;
+    }
+
+    public Map<String, Double> getAllCoeffs() {
+        Map<String, Double> allCoeffs = new HashMap<>();
+        allCoeffs.put("Победа 1", teamFirstWinCoeff);
+        allCoeffs.put("Ничья", drawCoeff);
+        allCoeffs.put("Победа 2", teamSecondWinCoeff);
+        allCoeffs.put("Победа 1 или ничья", teamFirstWinOrDrawCoeff);
+        allCoeffs.put("Победа 1 или победа 2", teamFirstWinOrSecondCoeff);
+        allCoeffs.put("Победа 2 или ничья", teamSecondWinOrDrawCoeff);
+        return allCoeffs;
     }
 }

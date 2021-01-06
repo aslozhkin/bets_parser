@@ -1,4 +1,4 @@
-package ru.allbets.bets_parser;
+package ru.allbets.bets_parser.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import ru.allbets.bets_parser.dao.BookmakerRepository;

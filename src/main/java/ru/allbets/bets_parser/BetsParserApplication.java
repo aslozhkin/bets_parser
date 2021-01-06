@@ -10,7 +10,7 @@ public class BetsParserApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(BetsParserApplication.class, args);
-//        ContextWrapper.getContext().getBean(Parser.class).start();
+        ContextWrapper.getContext().getBean(Parser.class).start();
     }
 
 }

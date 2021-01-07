@@ -7,4 +7,6 @@ public interface TeamRepository extends JpaRepository<Team, Integer> {
     Team findByMarathonBetName(String name);
 
     Team findByFonbetName(String name);
+
+    Team findByPariMatchName(String name);
 }

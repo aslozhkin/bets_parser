@@ -93,7 +93,8 @@ public class MarathonbetPage extends AbstractPage {
     }
 
     @Override
-    public Map<String, String> getEventData(WebElement webElement) {
+    public Map<String, String> getEventData(WebElement... webElements) {
+        WebElement webElement = webElements[0];
         Map<String, String> data = new HashMap<>();
         data.put("firstTeamName", webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[1]//span")).getText());
         data.put("secondTeamName", webElement.findElement(By.xpath(".//table[@class='member-area-content-table ']//tr[2]//span")).getText());

@@ -12,5 +12,5 @@ public abstract class AbstractPage extends Thread{
 
     public abstract void parseEvents();
 
-    public abstract Map<String, String> getEventData(WebElement eventElement);
+    public abstract Map<String, String> getEventData(WebElement... eventElements);
 }

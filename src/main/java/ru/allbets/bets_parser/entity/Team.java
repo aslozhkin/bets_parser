@@ -19,6 +19,9 @@ public class Team {
     @Column(name = "fonbet_name")
     private String fonbetName;
 
+    @Column(name = "parimatch_name")
+    private String pariMatchName;
+
     public Team() {
     }
 

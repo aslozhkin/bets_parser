@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.allbets.bets_parser.dao.EventRepository;
 import ru.allbets.bets_parser.pages.AbstractPage;
+import ru.allbets.bets_parser.pages.PariMatchPage;
 
 import java.util.List;
 

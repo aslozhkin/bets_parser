@@ -18,6 +18,9 @@ public class League {
     @Column(name = "fonbet_name")
     private String fonbetName;
 
+    @Column(name = "parimatch_name")
+    private String pariMatchName;
+
     public League() {
     }
 
@@ -43,5 +46,13 @@ public class League {
 
     public void setFonbetName(String fonbetName) {
         this.fonbetName = fonbetName;
+    }
+
+    public String getPariMatchName() {
+        return pariMatchName;
+    }
+
+    public void setPariMatchName(String pariMatchName) {
+        this.pariMatchName = pariMatchName;
     }
 }

@@ -3,6 +3,7 @@ package ru.allbets.bets_parser.pages;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,14 @@ public class FonbetPage extends AbstractPage {
 //        iter leagues
         List<League> leagues = leagueRepository.findAll();
         for (League league : leagues) {
-            if (league.getFonbetName().isEmpty()) break;
-            WebElement leagueLink = driver.findElement(By.xpath("//span[text()='" + league.getFonbetName() + "']"));
+            if (league.getFonbetName() == null || league.getFonbetName().isEmpty()) break;
+            WebElement leagueLink = null;
+            try {
+                leagueLink = driver.findElement(By.xpath("//span[text()='" + league.getFonbetName() + "']"));
+            } catch (NoSuchElementException exception) {
+                logger.info("У букмекера: \"" + name + "\" лига: \"" + league.getFonbetName() + "\" отсутствует");
+                break;
+            }
             leagueLink.click();
 //            Parse events
             List<WebElement> events = driver.findElements(By.xpath("//div[contains(@class,'top-event-list')]/div"));
@@ -89,7 +96,8 @@ public class FonbetPage extends AbstractPage {
     }
 
     @Override
-    public Map<String, String> getEventData(WebElement webElement) {
+    public Map<String, String> getEventData(WebElement... webElements) {
+        WebElement webElement = webElements[0];
         WebDriver driver = driverManager.getDriver();
         Map<String, String> data = new HashMap<>();
         data.put("firstTeamName", webElement.findElement(By.xpath(".//a[contains(@class,'title-teams')]//span[1]")).getText());

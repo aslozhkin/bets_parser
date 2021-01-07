@@ -138,12 +138,12 @@ public class Event {
 
     public Map<String, Double> getAllCoeffs() {
         Map<String, Double> allCoeffs = new HashMap<>();
-        allCoeffs.put("Победа 1", teamFirstWinCoeff);
-        allCoeffs.put("Ничья", drawCoeff);
-        allCoeffs.put("Победа 2", teamSecondWinCoeff);
-        allCoeffs.put("Победа 1 или ничья", teamFirstWinOrDrawCoeff);
-        allCoeffs.put("Победа 1 или победа 2", teamFirstWinOrSecondCoeff);
-        allCoeffs.put("Победа 2 или ничья", teamSecondWinOrDrawCoeff);
+        allCoeffs.put("П 1", teamFirstWinCoeff);
+        allCoeffs.put("Н", drawCoeff);
+        allCoeffs.put("П 2", teamSecondWinCoeff);
+        allCoeffs.put("П 1 или Н", teamFirstWinOrDrawCoeff);
+        allCoeffs.put("П 1 или П 2", teamFirstWinOrSecondCoeff);
+        allCoeffs.put("П 2 или Н", teamSecondWinOrDrawCoeff);
         return allCoeffs;
     }
 }

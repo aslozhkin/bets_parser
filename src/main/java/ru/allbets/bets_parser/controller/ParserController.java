@@ -7,6 +7,7 @@ import ru.allbets.bets_parser.dao.EventRepository;
 import ru.allbets.bets_parser.entity.Event;
 import ru.allbets.bets_parser.service.ContextWrapper;
 import ru.allbets.bets_parser.service.Parser;
+import ru.allbets.bets_parser.utils.EventUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class ParserController {
         int firstTeamId = event.getFirstTeamId();
         int secondTeamId = event.getSecondTeamId();
         List<Event> events = eventRepository.findAllByFirstTeamIdAndSecondTeamId(firstTeamId, secondTeamId);
-        return MergedEvent.mergeEvents(events);
+        return EventUtils.mergeEvents(events);
     }
 
     @GetMapping("/events/{count}")
@@ -61,7 +62,7 @@ public class ParserController {
         for (Event event : events) {
             int firstTeamId = event.getFirstTeamId();
             int secondTeamId = event.getSecondTeamId();
-            mergedEvents.add(MergedEvent.mergeEvents(eventRepository.findAllByFirstTeamIdAndSecondTeamId(firstTeamId, secondTeamId)));
+            mergedEvents.add(EventUtils.mergeEvents(eventRepository.findAllByFirstTeamIdAndSecondTeamId(firstTeamId, secondTeamId)));
         }
         return mergedEvents;
     }

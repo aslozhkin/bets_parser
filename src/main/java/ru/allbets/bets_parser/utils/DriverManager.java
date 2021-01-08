@@ -20,7 +20,7 @@ public class DriverManager {
 //            options.addArguments("--headless");
             driver.set(new ChromeDriver(options));
             driver.get().manage().timeouts().pageLoadTimeout(180, TimeUnit.SECONDS);
-            driver.get().manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+            driver.get().manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
         }
         return driver.get();
     }

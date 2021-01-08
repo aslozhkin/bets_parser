@@ -79,7 +79,17 @@ public class PariMatchPage extends AbstractPage {
                 Map<String, String> eventData = getEventData();
 
                 Team firstTeam = teamRepository.findByPariMatchName(eventData.get("firstTeamName"));
+                if (firstTeam == null) {
+                    logger.error("Команда с именем: \"" + eventData.get("firstTeamName") + "\" не найдена в таблице команд \"" + name + "\"");
+                    driver.navigate().back();
+                    continue;
+                }
                 Team secondTeam = teamRepository.findByPariMatchName(eventData.get("secondTeamName"));
+                if (secondTeam == null) {
+                    logger.error("Команда с именем: \"" + eventData.get("secondTeamName") + "\" не найдена в таблице команд \"" + name + "\"");
+                    driver.navigate().back();
+                    continue;
+                }
 
                 event.setLeagueId(league.getId());
                 event.setFirstTeamId(firstTeam.getId());
